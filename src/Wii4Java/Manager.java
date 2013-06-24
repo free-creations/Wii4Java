@@ -33,6 +33,14 @@ public class Manager {
    */
   private static final Object nativeLibLoadingLock = new Object();
   /**
+   * The whileConnecting flag tell whether we are about to connect.
+   */
+  private static boolean whileConnecting = false;
+  /**
+   * Protects the whileConnecting flag from concurrent access.
+   */
+  private static final Object whileConnectingLock = new Object();
+  /**
    * Internal identifier for the MS-Windows operating system.
    */
   private static final String WIN = "win";
@@ -114,13 +122,21 @@ public class Manager {
    */
   static public void connect(final WiiListener listener) {
     checkLoadNativeLib();
-    Thread connectingThread = new Thread(null, new Runnable() {
-      @Override
-      public void run() {
-        nConnect(listener);
+    synchronized (whileConnectingLock) {
+      // avoid starting two threads
+      if (whileConnecting) {
+        return;
       }
-    }, "WiiConnection");
-    connectingThread.start();
+      whileConnecting = true;
+      Thread connectingThread = new Thread(null, new Runnable() {
+        @Override
+        public void run() {
+          nConnect(listener);
+          whileConnecting = false;
+        }
+      }, "WiiConnection");
+      connectingThread.start();
+    }
 
   }
 
@@ -128,7 +144,9 @@ public class Manager {
 
   static public void disconnect(WiiListener listener) {
     checkLoadNativeLib();
-    nDisconnect(listener);
+    synchronized (whileConnectingLock) {
+      nDisconnect(listener);
+    }
   }
 
   private static native void nDisconnect(WiiListener listener);
