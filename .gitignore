@@ -1,2 +1,6 @@
 /native/nbproject/private/
 /nbproject/private/
+/build/
+/native/build/
+/native/dist/
+/dist/

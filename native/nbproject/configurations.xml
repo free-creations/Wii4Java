@@ -24,7 +24,9 @@
                    projectFiles="false"
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
+      <itemPath>readme.txt</itemPath>
     </logicalFolder>
+    <itemPath>readme.txt</itemPath>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -50,6 +52,8 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="readme.txt" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="wiiNative.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
@@ -85,6 +89,8 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="readme.txt" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="wiiNative.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
