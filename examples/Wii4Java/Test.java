@@ -44,12 +44,17 @@ public class Test {
 
     @Override
     public void buttonAChanged(boolean down) {
-      System.out.println("buttonAChanged down="+down);
+      System.out.println("buttonAChanged down=" + down);
     }
 
     @Override
     public void buttonBChanged(boolean down) {
-      System.out.println("buttonBChanged down="+down);
+      System.out.println("buttonBChanged down=" + down);
+    }
+
+    @Override
+    public void buttonEvent(int previousState, int newState) {
+      System.out.println("button event before=" + previousState + ", after=" + newState);
     }
   }
 
@@ -62,7 +67,7 @@ public class Test {
     Manager.connect(listener);
 
     Thread.sleep(60000);
- 
+
     Manager.disconnect(listener);
   }
 }

@@ -48,4 +48,14 @@ public interface WiiListener {
    * been released.
    */
   public void buttonBChanged(boolean down);
+
+  /**
+   * Informs the listener that a button has been pushed or released.
+   *
+   * @param previousState a bitmap describing the state of all buttons before
+   * the event occurred.
+   * @param newState a bitmap describing the state of all buttons after the
+   * event occurred.
+   */
+  public void buttonEvent(int previousState, int newState);
 }

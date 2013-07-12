@@ -17,9 +17,22 @@ bdaddr_t bdaddr; // bluetooth device address
 
 jobject wiiListener;
 JavaVM * jvm;
+/**
+ * Java Method identifier of the method "WiiListener.connectionChanged".
+ */
 jmethodID connectionChangedMid;
+/**
+ * Java Method identifier of the method "WiiListener.buttonAChanged".
+ */
 jmethodID buttonAChangedMid;
+/**
+ * Java Method identifier of the method "WiiListener.buttonBChanged".
+ */
 jmethodID buttonBChangedMid;
+/**
+ * Java Method identifier of the method "WiiListener.buttonEvent".
+ */
+jmethodID buttonEventMid;
 cwiid_mesg_callback_t cwiid_callback;
 
 uint16_t previousButtons;
@@ -39,6 +52,11 @@ void handleButtonMessage(uint16_t buttons) {
     env->CallVoidMethod(wiiListener, buttonBChangedMid,
             (jboolean) (buttons & buttonBmask));
   }
+
+  env->CallVoidMethod(wiiListener, buttonEventMid,
+          (jint)previousButtons,
+          (jint)buttons);
+
   jvm->DetachCurrentThread();
   previousButtons = buttons;
 }
@@ -84,11 +102,13 @@ JNIEXPORT void JNICALL Java_Wii4Java_Manager_nConnect
     {0, 0, 0, 0, 0, 0}
   };
 
+  // cache the method identifier of the given WiiListener object.
   wiiListener = env->NewGlobalRef(listener);
   jclass listenerClass = env->GetObjectClass(wiiListener);
   connectionChangedMid = env->GetMethodID(listenerClass, "connectionChanged", "(I)V");
   buttonAChangedMid = env->GetMethodID(listenerClass, "buttonAChanged", "(Z)V");
   buttonBChangedMid = env->GetMethodID(listenerClass, "buttonBChanged", "(Z)V");
+  buttonEventMid = env->GetMethodID(listenerClass, "buttonEvent", "(II)V");
 
   // Connect to the wiimote
   wiimote = cwiid_open(&bdaddr, 0);
