@@ -73,7 +73,7 @@ limitations under the License.
   
   <target name="-cc-linux32-init" if="is-linux32">
     <property name="make" value="make" />    
-    <echo message="Building name for outfile: os.arch ='${os.arch}'."/>  
+    <property name="cc-jni-inc-os.dir"   location="${cc-jni-incbase.dir}/linux"/> 
     <property name="cc-outfile" 
               value="${cc-dist.dir}/lib${PROJECT_NAME}-linux32-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.so"/> 
   </target>
