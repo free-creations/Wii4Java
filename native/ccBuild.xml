@@ -49,23 +49,44 @@ limitations under the License.
     <os family="windows" />
   </condition>
 
-  <condition property="is-linux" value="true">
-    <os family="unix" />
+  <condition property="is-linux64" value="true">
+    <and>
+      <os family="unix" />
+      <os arch="amd64" />
+    </and>
   </condition>
+  
+  <condition property="is-linux32" value="true">
+    <and>
+      <os family="unix" />
+      <not>
+        <os arch="amd64" />
+      </not>
+    </and>
+  </condition>
+
 
   <target name="-cc-win-init" if="is-windows">
     <property name="compiler" value="msvc" />    
-    <property name="cc-outfile" value="${cc-dist.dir}/MidiIO4Java-win32-0.0.1"/> 
+    <property name="cc-outfile" value="${cc-dist.dir}/Wii4Java-win32-0.0.1"/> 
   </target>
   
-  <target name="-cc-linux-init" if="is-linux">
+  <target name="-cc-linux32-init" if="is-linux32">
     <property name="make" value="make" />    
-    <property name="cc-jni-inc-os.dir"   location="${cc-jni-incbase.dir}/linux"/>
+    <echo message="Building name for outfile: os.arch ='${os.arch}'."/>  
+    <property name="cc-outfile" 
+              value="${cc-dist.dir}/lib${PROJECT_NAME}-linux32-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.so"/> 
+  </target>
+  
+  
+  <target name="-cc-linux64-init" if="is-linux64">
+    <property name="make" value="make" />    
+    <property name="cc-jni-inc-os.dir"   location="${cc-jni-incbase.dir}/linux"/> 
     <property name="cc-outfile" 
               value="${cc-dist.dir}/lib${PROJECT_NAME}-linux64-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.so"/> 
   </target>
   
-  <target name="-cc-init" depends="-cc-win-init, -cc-linux-init">
+  <target name="-cc-init" depends="-cc-win-init, -cc-linux32-init, -cc-linux64-init">
     <mkdir dir="${cc-javah.dir}" /> 
   </target>
   
@@ -125,11 +146,11 @@ limitations under the License.
   <target name="-cc-javah-test" 
           depends="-cc-javah-test-clean, -do-compile, -do-compile-test" if="is-test">
     <!--
-    <javah classpath="build/test/classes" 
-           destdir="${cc-javah-test.dir}" 
-           verbose="yes"
-           class="${javah-test.classes}"/>   
-           -->
+<javah classpath="build/test/classes" 
+    destdir="${cc-javah-test.dir}" 
+    verbose="yes"
+    class="${javah-test.classes}"/>   
+    -->
   </target>
 
   <target name="-cc-compile" 
