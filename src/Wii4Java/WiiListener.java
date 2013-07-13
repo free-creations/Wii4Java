@@ -15,15 +15,17 @@
  */
 package Wii4Java;
 
+import javax.swing.SwingUtilities;
+
 /**
  *
  * @author Harald <Harald at free-creations.de>
  */
-public interface WiiListener {
+public abstract class WiiListener {
 
-  public static int CONNECTED = 0; // the connection has successfully been established
-  public static int ABORTED = 1; // the connection failed for some reason
-  public static int ENDED = 2; // the connection ended normally
+  public final static int CONNECTED = 0; // the connection has successfully been established
+  public final static int ABORTED = 1; // the connection failed for some reason
+  public final static int ENDED = 2; // the connection ended normally
 
   /**
    * Informs the listener about changes in the status of the Bluetooth
@@ -31,7 +33,14 @@ public interface WiiListener {
    *
    * @param status the new status of the connection.
    */
-  public void connectionChanged(int connectionStatus);
+  private void connectionChangedNative(final int connectionStatus) {
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        connectionChanged(connectionStatus);
+      }
+    });
+  }
 
   /**
    * Informs the listener that the Button A has been pushed or released.
@@ -39,7 +48,14 @@ public interface WiiListener {
    * @param down true if the button has been pushed, false if the button has
    * been released.
    */
-  public void buttonAChanged(boolean down);
+  private void buttonAChangedNative(final boolean down) {
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        buttonAChanged(down);
+      }
+    });
+  }
 
   /**
    * Informs the listener that the Button B has been pushed or released.
@@ -47,7 +63,14 @@ public interface WiiListener {
    * @param down true if the button has been pushed, false if the button has
    * been released.
    */
-  public void buttonBChanged(boolean down);
+  private void buttonBChangedNative(final boolean down) {
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        buttonBChanged(down);
+      }
+    });
+  }
 
   /**
    * Informs the listener that a button has been pushed or released.
@@ -57,5 +80,46 @@ public interface WiiListener {
    * @param newState a bitmap describing the state of all buttons after the
    * event occurred.
    */
-  public void buttonEvent(int previousState, int newState);
+  private void buttonEventNative(final int previousState, final int newState) {
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        buttonEvent(previousState, newState);
+      }
+    });
+  }
+
+  /**
+   * Informs the listener about changes in the status of the Bluetooth
+   * connection.
+   *
+   * @param status the new status of the connection.
+   */
+  public abstract void connectionChanged(int connectionStatus);
+
+  /**
+   * Informs the listener that the Button A has been pushed or released.
+   *
+   * @param down true if the button has been pushed, false if the button has
+   * been released.
+   */
+  public abstract void buttonAChanged(boolean down);
+
+  /**
+   * Informs the listener that the Button B has been pushed or released.
+   *
+   * @param down true if the button has been pushed, false if the button has
+   * been released.
+   */
+  public abstract void buttonBChanged(boolean down);
+
+  /**
+   * Informs the listener that a button has been pushed or released.
+   *
+   * @param previousState a bitmap describing the state of all buttons before
+   * the event occurred.
+   * @param newState a bitmap describing the state of all buttons after the
+   * event occurred.
+   */
+  public abstract void buttonEvent(int previousState, int newState);
 }

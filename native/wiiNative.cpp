@@ -105,10 +105,10 @@ JNIEXPORT void JNICALL Java_Wii4Java_Manager_nConnect
   // cache the method identifier of the given WiiListener object.
   wiiListener = env->NewGlobalRef(listener);
   jclass listenerClass = env->GetObjectClass(wiiListener);
-  connectionChangedMid = env->GetMethodID(listenerClass, "connectionChanged", "(I)V");
-  buttonAChangedMid = env->GetMethodID(listenerClass, "buttonAChanged", "(Z)V");
-  buttonBChangedMid = env->GetMethodID(listenerClass, "buttonBChanged", "(Z)V");
-  buttonEventMid = env->GetMethodID(listenerClass, "buttonEvent", "(II)V");
+  connectionChangedMid = env->GetMethodID(listenerClass, "connectionChangedNative", "(I)V");
+  buttonAChangedMid = env->GetMethodID(listenerClass, "buttonAChangedNative", "(Z)V");
+  buttonBChangedMid = env->GetMethodID(listenerClass, "buttonBChangedNative", "(Z)V");
+  buttonEventMid = env->GetMethodID(listenerClass, "buttonEventNative", "(II)V");
 
   // Connect to the wiimote
   wiimote = cwiid_open(&bdaddr, 0);

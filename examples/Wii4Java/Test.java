@@ -23,7 +23,7 @@ import java.io.IOException;
  */
 public class Test {
 
-  private static class Listener implements WiiListener {
+  private static class Listener extends WiiListener {
 
     @Override
     public void connectionChanged(int connectionStatus) {
