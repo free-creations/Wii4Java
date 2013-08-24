@@ -33,7 +33,13 @@ jmethodID buttonBChangedMid;
  * Java Method identifier of the method "WiiListener.buttonEvent".
  */
 jmethodID buttonEventMid;
+/**
+ * Java Method identifier of the method "WiiListener.accelerometerEvent".
+ */
+jmethodID accelerometerEventMid;
 cwiid_mesg_callback_t cwiid_callback;
+
+acc_cal wm_cal;
 
 uint16_t previousButtons;
 uint16_t buttonAmask = 8;
@@ -54,11 +60,25 @@ void handleButtonMessage(uint16_t buttons) {
   }
 
   env->CallVoidMethod(wiiListener, buttonEventMid,
-          (jint)previousButtons,
-          (jint)buttons);
+          (jint) previousButtons,
+          (jint) buttons);
 
   jvm->DetachCurrentThread();
   previousButtons = buttons;
+}
+
+void handleAccelerometerEvent(int accX, int accY, int accZ) {
+  JNIEnv * env;
+
+  jvm->AttachCurrentThread((void**) &env, NULL);
+
+
+  env->CallVoidMethod(wiiListener, accelerometerEventMid,
+          (jint) accX,
+          (jint) accY,
+          (jint) accZ);
+
+  jvm->DetachCurrentThread();
 }
 
 /**
@@ -74,6 +94,12 @@ void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
     switch (mesg[i].type) {
       case CWIID_MESG_BTN:
         handleButtonMessage(mesg[i].btn_mesg.buttons);
+        break;
+      case CWIID_MESG_ACC:
+        handleAccelerometerEvent(
+                mesg[i].acc_mesg.acc[CWIID_X] - wm_cal.zero[CWIID_X],
+                mesg[i].acc_mesg.acc[CWIID_Y] - wm_cal.zero[CWIID_Y],
+                mesg[i].acc_mesg.acc[CWIID_Z] - wm_cal.zero[CWIID_Z]);
         break;
       default:
         printf("Unknown Report");
@@ -109,6 +135,7 @@ JNIEXPORT void JNICALL Java_Wii4Java_Manager_nConnect
   buttonAChangedMid = env->GetMethodID(listenerClass, "buttonAChangedNative", "(Z)V");
   buttonBChangedMid = env->GetMethodID(listenerClass, "buttonBChangedNative", "(Z)V");
   buttonEventMid = env->GetMethodID(listenerClass, "buttonEventNative", "(II)V");
+  accelerometerEventMid = env->GetMethodID(listenerClass, "accelerometerEvent", "(III)V");
 
   // Connect to the wiimote
   wiimote = cwiid_open(&bdaddr, 0);
@@ -129,8 +156,15 @@ JNIEXPORT void JNICALL Java_Wii4Java_Manager_nConnect
     return;
   }
 
+  if (cwiid_get_acc_cal(wiimote, CWIID_EXT_NONE, &wm_cal)) {
+    std::cerr << "Unable to retrieve accelerometer calibration\n";
+    wm_cal.zero[CWIID_X] = 124;
+    wm_cal.zero[CWIID_Y] = 124;
+    wm_cal.zero[CWIID_Z] = 124;
+  }
+
   cwiid_enable(wiimote, CWIID_FLAG_MESG_IFC);
-  cwiid_set_rpt_mode(wiimote, CWIID_RPT_BTN);
+  cwiid_set_rpt_mode(wiimote, CWIID_RPT_BTN | CWIID_RPT_ACC);
 
   env->CallVoidMethod(wiiListener, connectionChangedMid,
           (jint) Wii4Java_WiiListener_CONNECTED);

@@ -21,9 +21,14 @@ import java.io.IOException;
  *
  * @author Harald <Harald at free-creations.de>
  */
-public class Test {
+public class TestRoll {
 
   private static class Listener extends WiiListener {
+
+    int prevX = 0;
+    int prevZ = 0;
+    boolean btnAdown = false;
+    int roll = 0; //the roll angle in arbitrary units
 
     @Override
     public void connectionChanged(int connectionStatus) {
@@ -44,27 +49,44 @@ public class Test {
 
     @Override
     public void buttonAChanged(boolean down) {
-      System.out.println("buttonAChanged down=" + down);
+      btnAdown = down;
+      roll = 0;
     }
 
     @Override
     public void buttonBChanged(boolean down) {
-      System.out.println("buttonBChanged down=" + down);
     }
 
     @Override
     public void buttonEvent(int previousState, int newState) {
-      System.out.println("button event before=" + previousState + ", after=" + newState);
     }
 
     @Override
-    public void accelerometerEvent(int accX, int accY, int accZ) {
-      System.out.println(String.format("Accelerometer=%3d, %3d, %3d",
-              accX,
-              accY,
-              accZ));
+    public void accelerometerEvent(int accX, int ignore, int accZ) {
+      if (btnAdown) {
+        calculateRoll(
+                accX,
+                accZ,
+                prevX - accX,
+                prevZ - accZ);
+      }
+      prevX = accX;
+      prevZ = accZ;
+    }
+    
+    private void calculateRoll(int X, int Z, int deltaX, int deltaZ){
+      int deltaR = deltaRoll( X,  Z,  deltaX,  deltaZ);
+      roll += deltaR;
+      System.out.println(" Roll = "+roll);
+      
+    }
+    private int deltaRoll(int X, int Z, int deltaX, int deltaZ){
+      return X*deltaZ -Z*deltaX;
+      
     }
   }
+  
+  
 
   /**
    * @param args the command line arguments

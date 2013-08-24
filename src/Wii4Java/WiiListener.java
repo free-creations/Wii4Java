@@ -89,6 +89,15 @@ public abstract class WiiListener {
     });
   }
 
+  private void accelerometerEventNative(final int accX, final int accY, final int accZ) {
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        accelerometerEvent(accX, accY, accZ);
+      }
+    });
+  }
+
   /**
    * Informs the listener about changes in the status of the Bluetooth
    * connection.
@@ -122,4 +131,13 @@ public abstract class WiiListener {
    * event occurred.
    */
   public abstract void buttonEvent(int previousState, int newState);
+
+  /**
+   * Informs the listener about the current accelerometer state.
+   *
+   * @param accX acceleration in the x direction (value ranging from -124 to 124)
+   * @param accY acceleration in the y direction
+   * @param accZ acceleration in the z direction
+   */
+  public abstract void accelerometerEvent(int accX, int accY, int accZ);
 }
